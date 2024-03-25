@@ -13,38 +13,25 @@ import spacy
 def getting_data():
     url = 'https://www.olx.ua/uk/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/kiev/?currency=UAH&search%5Bfilter_float_price:to%5D=15000&search%5Bfilter_enum_commission%5D%5B0%5D=1&search%5Bfilter_enum_pets%5D%5B0%5D=yes_cat'
 
-    browser = start_chrome(url, headless=True)
-    soup = BeautifulSoup(browser.page_source, 'html.parser')
+    # Set up Selenium WebDriver
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')  # To run the browser in headless mode
+    browser = webdriver.Chrome(options=options)
+    browser.get(url)
 
-    find_data = soup.find_all('div', {'class': 'css-1apmciz'})
+    # Extracting data using Selenium
+    titles = [element.text.strip() for element in browser.find_elements_by_css_selector('.css-16v5mdi.er34gjf0')]
+    prices = [element.text.strip() for element in browser.find_elements_by_css_selector('.css-10b0gli.er34gjf0')]
+    locations = [element.text.strip() for element in browser.find_elements_by_css_selector('.css-1a4brun.er34gjf0')]
+    ploshcha = [element.text.strip() for element in browser.find_elements_by_css_selector('.css-643j0o')]
 
-    find_title = soup.find_all('h6', {'class': 'css-16v5mdi er34gjf0'})
-    find_price = soup.find_all('p', {'class': 'css-10b0gli er34gjf0'})
-    find_location_date = soup.find_all('p', {'class': 'css-1a4brun er34gjf0'})
-    find_ploshcha = soup.find_all('span', {'class': 'css-643j0o'})
-
-    titles = []
-    for element in find_title:
-        data = element.text.strip()
-        titles.append(data)
-
-    prices = []
-    for element in find_price:
-        data = element.text.strip()
-        prices.append(data)
-
-    locations = []
-    for element in find_location_date:
-        data = element.text.strip()
-        locations.append(data)
-
-    ploshcha = []
-    for element in find_ploshcha:
-        data = element.text.strip()
-        ploshcha.append(data)
-
+    # Constructing DataFrame
     all_data = {'All_data': titles, 'Price': prices, 'Location': locations, 'Area': ploshcha}
     df = pd.DataFrame(all_data)
+
+    # Close the browser
+    browser.quit()
+
     return df
 
 
