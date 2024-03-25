@@ -84,7 +84,7 @@ print(df3)
 
 
 # TODO: конкурентно записуєте всі ці датафрейми в Google Sheet, кожен датафрейм на свій аркуш.
-async def update_sheet(df):
+async def update_sheet(df, range):
     # SCOPES = ['https:///www.googleapis.com/auth/sqkservice.admin']
     SERVICE_ACCOUNT_FILE = 'key.json'
     SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
@@ -112,7 +112,7 @@ async def update_sheet(df):
         # Update the spreadsheet with the new data
         result = service_sheets.spreadsheets().values().update(
             spreadsheetId=SAMPLE_SPREADSHEET_ID,
-            range="feed4!A:F",
+            range=range,
             valueInputOption="USER_ENTERED", body=body
         ).execute()
         print("Sheet updated successfully.")
@@ -121,5 +121,6 @@ async def update_sheet(df):
         print(f"Error updating sheet: {e}")
         return None
 
-
-asyncio.run(update_sheet(df3))
+asyncio.run(update_sheet(df=df1, range="feed3!A:D"))
+asyncio.run(update_sheet(df=df2, range="feed3!A:F"))
+asyncio.run(update_sheet(df=df3, range="feed4!A:F"))
